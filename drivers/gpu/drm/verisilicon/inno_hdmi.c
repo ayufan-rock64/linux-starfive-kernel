@@ -588,13 +588,10 @@ static int inno_hdmi_setup(struct inno_hdmi *hdmi,
 	hdmi->tmds_rate = mode->clock * 1000;
 	inno_hdmi_phy_clk_set_rate(hdmi,hdmi->tmds_rate);
 
-	dev_info(hdmi->dev, "inno_hdmi_phy_clk_set_rate begin");
-
 	while (!(hdmi_readb(hdmi, 0x1a9) & 0x1))
 	;
 	while (!(hdmi_readb(hdmi, 0x1af) & 0x1))
 	;
-	dev_info(hdmi->dev, "inno_hdmi_phy_clk_set_rate done");
 
 	/*turn on LDO*/
 	hdmi_writeb(hdmi, 0x1b4, 0x7);
@@ -720,8 +717,6 @@ inno_hdmi_connector_mode_valid(struct drm_connector *connector,
 			       struct drm_display_mode *mode)
 {
 	u32 vic = drm_match_cea_mode(mode);
-
-	dev_info(connector->dev->dev, "drm_match_cea_mode clock=%d, vic=%d\n", mode->clock, vic);
 
 	if (mode->clock > 297000)
 		return MODE_BAD;
@@ -1086,8 +1081,8 @@ static int inno_hdmi_bind(struct device *dev, struct device *master,
 	if (ret)
 		dev_err(dev, "failed to audio init\n");
 
-	// pm_runtime_use_autosuspend(&pdev->dev);
-	// pm_runtime_set_autosuspend_delay(&pdev->dev, 1000);
+	pm_runtime_use_autosuspend(&pdev->dev);
+	pm_runtime_set_autosuspend_delay(&pdev->dev, 1000);
 	pm_runtime_enable(&pdev->dev);
 
 	inno_hdmi_disable_clk_assert_rst(dev, hdmi);
