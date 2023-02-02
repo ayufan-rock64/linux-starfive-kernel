@@ -1681,7 +1681,7 @@ static const struct of_device_id cdns_dsi_of_match[] = {
 	{ },
 };
 
-static struct platform_driver cdns_dsi_platform_driver = {
+struct platform_driver cdns_dsi_platform_driver = {
 	.probe  = cdns_dsi_drm_probe,
 	.remove = cdns_dsi_drm_remove,
 	.driver = {
@@ -1690,11 +1690,11 @@ static struct platform_driver cdns_dsi_platform_driver = {
 		.pm = &cdns_dsi_pm_ops,
 	},
 };
-module_platform_driver(cdns_dsi_platform_driver);
+//module_platform_driver(cdns_dsi_platform_driver);
 
 
-MODULE_AUTHOR("Boris Brezillon <boris.brezillon@bootlin.com>");
-MODULE_DESCRIPTION("Cadence DSI driver");
-MODULE_LICENSE("GPL");
-MODULE_ALIAS("platform:cdns-dsi");
+// MODULE_AUTHOR("Boris Brezillon <boris.brezillon@bootlin.com>");
+// MODULE_DESCRIPTION("Cadence DSI driver");
+// MODULE_LICENSE("GPL");
+// MODULE_ALIAS("platform:cdns-dsi");
 

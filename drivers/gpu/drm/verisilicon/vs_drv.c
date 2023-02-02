@@ -298,9 +298,13 @@ static const struct component_master_ops vs_drm_ops = {
 	.unbind = vs_drm_unbind,
 };
 
+extern struct platform_driver cdns_dsi_platform_driver;
+
 static struct platform_driver *drm_sub_drivers[] = {
 	/* put display control driver at start */
 	&dc_platform_driver,
+
+	&cdns_dsi_platform_driver,
 
 	/* connector */
 #ifdef CONFIG_STARFIVE_INNO_HDMI

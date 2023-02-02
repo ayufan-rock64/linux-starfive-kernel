@@ -196,9 +196,9 @@ static int encoder_bind(struct device *dev, struct device *master, void *data)
 	
 	int ret;
 
-#ifdef CONFIG_STARFIVE_DSI
+//#ifdef CONFIG_STARFIVE_DSI
 	struct drm_panel *tmp_panel;
-#endif
+//#endif
 
 	encoder = &simple->encoder;
 
