@@ -33,6 +33,12 @@
 		i2c6 = &i2c6;
 	};
 
+	gpio-restart {
+		compatible = "gpio-restart";
+		gpios = <&gpio 35 GPIO_ACTIVE_HIGH>;
+		priority = <160>;
+	};
+
 	chosen {
 		stdout-path = "serial0:115200";
 		#bootargs = "debug console=ttyS0 rootwait";
@@ -40,6 +46,11 @@
 
 	cpus {
 		timebase-frequency = <4000000>;
+	};
+
+	backlight: backlight {
+		compatible = "gpio-backlight";
+		gpios = <&gpio 22 GPIO_ACTIVE_HIGH>;
 	};
 
 	memory@40000000 {
@@ -537,5 +548,143 @@
 };
 
 &xrp {
+	status = "okay";
+};
+
+//------
+
+&dc_out {
+  dc_out_dpi2: endpoint@2 {
+    reg = <2>;
+    remote-endpoint = <&mipi_in>;
+  };
+};
+
+&dsi_output {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			mipi_in: endpoint {
+				remote-endpoint = <&dc_out_dpi2>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			sf_dpi_output: endpoint {
+				remote-endpoint = <&dsi_in_port>;
+			};
+		};
+	};
+};
+
+&mipi_dsi {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dsi0_output: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&panel_out0>;
+			};
+
+			dsi1_output: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&panel_out1>;
+			};
+		};
+
+		port@1{
+			reg = <1>;
+			dsi_in_port: endpoint {
+				remote-endpoint = <&sf_dpi_output>;
+			};
+		};
+	};
+
+	mipi_panel: panel@0 {
+		compatible = "feiyang,fy07024di26a30d";
+		reg = <0x0>;
+		reset-gpio = <&gpio 23 0>;
+		avdd-supply = <&hdmi_1p8>;
+		backlight = <&backlight>;
+		dvdd-supply = <&mipi_0p9>;
+
+		port {
+			panel_out1: endpoint {
+				remote-endpoint = <&dsi1_output>;
+			};
+		};
+	};
+};
+
+&gpio {
+	i2c2_pins: i2c2-pins {
+		i2c2-pins-scl {
+			starfive,pins = <PAD_GPIO3>;
+			starfive,pin-ioconfig = <IO(GPIO_IE(1) | (GPIO_PU(1)))>;
+			starfive,pin-gpio-dout = <GPO_LOW>;
+			starfive,pin-gpio-doen = <OEN_I2C2_IC_CLK_OE>;
+			starfive,pin-gpio-din =  <GPI_I2C2_IC_CLK_IN_A>;
+		};
+
+		i2c2-pins-sda {
+			starfive,pins = <PAD_GPIO2>;
+			starfive,pin-ioconfig = <IO(GPIO_IE(1) | (GPIO_PU(1)))>;
+			starfive,pin-gpio-dout = <GPO_LOW>;
+			starfive,pin-gpio-doen = <OEN_I2C2_IC_DATA_OE>;
+			starfive,pin-gpio-din =  <GPI_I2C2_IC_DATA_IN_A>;
+		};
+	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	i2c-sda-hold-time-ns = <300>;
+	i2c-sda-falling-time-ns = <510>;
+	i2c-scl-falling-time-ns = <510>;
+	auto_calc_scl_lhcnt;
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c2_pins>;
+	status = "okay";
+
+	panel_radxa@19 {
+		compatible ="starfive_jadard";
+		reg = <0x19>;
+		reset-gpio = <&gpio 23 0>;
+		enable-gpio = <&gpio 22 0>;
+		status = "disabled";
+
+		port {
+			panel_out0: endpoint {
+				remote-endpoint = <&dsi0_output>;
+			};
+		};
+	};
+
+	gt9xx: gt9xx@14 {
+		compatible = "goodix,gt9xx";
+		reg = <0x14>;
+		touch-gpio = <&gpio 30 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpio = <&gpio 31 GPIO_ACTIVE_HIGH>;
+		max-x = <800>;
+		max-y = <1280>;
+		tp-size = <9112>;
+	};
+};
+
+&mipi_dphy {
 	status = "okay";
 };

@@ -218,16 +218,21 @@ static int feiyang_dsi_probe(struct mipi_dsi_device *dsi)
 	}
 
 	ret = drm_panel_of_backlight(&ctx->panel);
+	dev_info(&dsi->dev, "drm_panel_of_backlight: %d\n", ret);
 	if (ret)
 		return ret;
 
 	drm_panel_add(&ctx->panel);
 
-	dsi->mode_flags = MIPI_DSI_MODE_VIDEO_BURST;
+	dsi->mode_flags = (MIPI_DSI_MODE_VIDEO |
+				MIPI_DSI_MODE_VIDEO_SYNC_PULSE |
+				MIPI_DSI_MODE_LPM); //MIPI_DSI_MODE_VIDEO_BURST;
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	dsi->lanes = 4;
 
-	return mipi_dsi_attach(dsi);
+	ret = mipi_dsi_attach(dsi);
+	dev_info(&dsi->dev, "mipi_dsi_attach: %d\n", ret);
+	return ret;
 }
 
 static int feiyang_dsi_remove(struct mipi_dsi_device *dsi)

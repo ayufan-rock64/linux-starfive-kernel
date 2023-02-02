@@ -207,6 +207,7 @@ static int encoder_bind(struct device *dev, struct device *master, void *data)
 
 	ret = drm_encoder_init(drm_dev, encoder, &encoder_funcs,
 				   simple->priv->encoder_type, NULL);
+	dev_info(dev,"drm_encoder_init ret=%d\n", ret);
 	if (ret)
 		return ret;
 
@@ -215,8 +216,10 @@ static int encoder_bind(struct device *dev, struct device *master, void *data)
 	encoder->possible_crtcs =
 			drm_of_find_possible_crtcs(drm_dev, dev->of_node);
 	encoder->possible_crtcs = 2;
+	dev_info(dev,"drm_of_find_possible_crtcs ret=%d\n", encoder->possible_crtcs);
 
 	ret = drm_of_find_panel_or_bridge(dev->of_node, 1, 0,&tmp_panel, &bridge);
+	dev_info(dev,"drm_of_find_panel_or_bridge ret=%d\n", ret);
 	if (ret){
 		printk("no panel, %d\n",ret);
 		//dev_err_probe(dev, ret, "endpoint returns %d\n", ret);
@@ -230,6 +233,7 @@ static int encoder_bind(struct device *dev, struct device *master, void *data)
 #else
 	ret = drm_bridge_attach(encoder, bridge, NULL);
 #endif
+	dev_info(dev,"drm_bridge_attach ret=%d\n", ret);
 	if (ret)
 		goto err;
 
